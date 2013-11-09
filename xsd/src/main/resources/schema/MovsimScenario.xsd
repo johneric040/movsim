@@ -41,6 +41,7 @@
                 <xs:element ref="VehiclePrototypes" minOccurs="0" maxOccurs="1" />
                 <xs:element name="ServiceProviders" type="ServiceProvidersType" minOccurs="0" maxOccurs="1" />
                 <xs:element name="RoadTypeSpeedMappings" type="RoadTypeSpeedMappingsType" minOccurs="0" maxOccurs="1" />
+                <xs:element name="PlatoonManager" type="PlatoonManagerType" minOccurs="0" maxOccurs="1" />
                 <xs:element ref="Scenario" minOccurs="0" maxOccurs="1" />
             </xs:sequence>
         </xs:complexType>
@@ -485,6 +486,27 @@
         </xs:sequence>
         <xs:attribute name="roadId" type="xs:string" />
     </xs:complexType>
+    
+    <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+     <xs:complexType name="PlatoonManagerType">
+        <xs:sequence>
+            <xs:element name="PlatoonConfiguration" type="PlatoonConfigurationType" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    
+     <xs:complexType name="PlatoonConfigurationType">
+        <xs:sequence>
+            <xs:element name="PlatoonVehicle" type="PlatoonVehicleType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="max_size" type="positiveInteger" />
+        <xs:attribute name="max_distance" type="positiveDouble" />
+        <xs:attribute name="max_speed_difference" type="positiveDouble" />
+    </xs:complexType>
+    
+    <xs:complexType name="PlatoonVehicleType">
+        <xs:attribute name="label" type="xs:string" />
+    </xs:complexType>
+    
     <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
     <xs:element name="Scenario">
         <xs:annotation>

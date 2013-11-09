@@ -52,6 +52,7 @@ import org.movsim.output.FileTrafficSourceData;
 import org.movsim.output.SimulationOutput;
 import org.movsim.shutdown.ShutdownHooks;
 import org.movsim.simulator.observer.ServiceProviders;
+import org.movsim.simulator.platoons.PlatoonManager;
 import org.movsim.simulator.roadnetwork.InitialConditionsMacro;
 import org.movsim.simulator.roadnetwork.LaneSegment;
 import org.movsim.simulator.roadnetwork.Lanes;
@@ -103,6 +104,8 @@ public class Simulator implements SimulationTimeStep, SimulationRun.CompletionCa
 
     private ServiceProviders serviceProviders;
 
+    private PlatoonManager platoonManager;
+
     private SimulationOutput simOutput;
     private final RoadNetwork roadNetwork;
     private Routing routing;
@@ -151,6 +154,10 @@ public class Simulator implements SimulationTimeStep, SimulationRun.CompletionCa
 
         if (inputData.isSetServiceProviders()) {
             serviceProviders = new ServiceProviders(inputData.getServiceProviders(), routing, roadNetwork);
+        }
+
+        if (inputData.isSetPlatoonManager()) {
+            platoonManager = new PlatoonManager(inputData.getPlatoonManager(), roadNetwork);
         }
 
         vehicleFactory = new VehicleFactory(simulationInput.getTimestep(), inputData.getVehiclePrototypes(),
@@ -578,6 +585,9 @@ public class Simulator implements SimulationTimeStep, SimulationRun.CompletionCa
 
         trafficLights.timeStep(dt, simulationTime, iterationCount);
         regulators.timeStep(dt, simulationTime, iterationCount);
+        if (platoonManager != null) {
+            platoonManager.timeStep(dt, simulationTime, iterationCount);
+        }
         roadNetwork.timeStep(dt, simulationTime, iterationCount);
 
         if (simOutput != null) {
