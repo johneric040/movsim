@@ -180,6 +180,7 @@ public class Vehicle {
 
     private final TrafficLightApproaching trafficLightApproaching;
     private final InhomogeneityAdaption inhomogeneity;
+    private final PlatoonSettings platoonSettings = new PlatoonSettings();
 
     private final EnergyModel energyModel = new EnergyModel(this);
 
@@ -608,7 +609,7 @@ public class Vehicle {
             }
         }
 
-        double alphaTLocal = inhomogeneity.alphaT();
+        double alphaTLocal = inhomogeneity.alphaT() * platoonSettings.getAlphaT();
         double alphaV0Local = inhomogeneity.alphaV0();
         double alphaALocal = 1;
 
@@ -1240,6 +1241,10 @@ public class Vehicle {
 
     public RoutingDecisions routingDecisions() {
         return routingDecisions;
+    }
+
+    public PlatoonSettings getPlatoonSettings() {
+        return platoonSettings;
     }
 
 }

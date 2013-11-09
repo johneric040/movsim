@@ -496,7 +496,7 @@
     
      <xs:complexType name="PlatoonConfigurationType">
         <xs:sequence>
-            <xs:element name="PlatoonVehicle" type="PlatoonVehicleType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="PlatoonVehicle" type="PlatoonVehicleType"  />
         </xs:sequence>
         <xs:attribute name="max_size" type="positiveInteger" />
         <xs:attribute name="max_distance" type="positiveDouble" />
