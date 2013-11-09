@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Movsim>
+	<!-- disable fd output  for scan -->
+    <VehiclePrototypes write_fund_diagrams="false">
+        <!-- car with traffic information -->
+        <VehiclePrototypeConfiguration label="Equipped" length="6" maximum_deceleration="10">
+            <AccelerationModelType>
+                <ModelParameterACC v0="30" T="1.4" s0="2" s1="0" delta="4" a="2" b="2.0" coolness="1" />
+            </AccelerationModelType>
+            <LaneChangeModelType european_rules="true" crit_speed_eur="20">
+                <ModelParameterMOBIL safe_deceleration="5.0" minimum_gap="2.0" threshold_acceleration="0.1" right_bias_acceleration="0." politeness="0.1" />
+            </LaneChangeModelType>
+        </VehiclePrototypeConfiguration>
+        <!-- car without traffic information -->
+        <VehiclePrototypeConfiguration label="NonEquipped" length="6" maximum_deceleration="10">
+            <AccelerationModelType>
+                <ModelParameterACC v0="30" T="1.4" s0="2" s1="0" delta="4" a="2" b="2.0" coolness="1" />
+            </AccelerationModelType>
+            <LaneChangeModelType european_rules="true" crit_speed_eur="20">
+                <ModelParameterMOBIL safe_deceleration="5.0" minimum_gap="2.0" threshold_acceleration="0.1" right_bias_acceleration="0." politeness="0.1" />
+            </LaneChangeModelType>
+        </VehiclePrototypeConfiguration>
+    </VehiclePrototypes>
+    
+    <RoadTypeSpeedMappings>
+        <RoadTypeSpeedMapping road_type="motorway" default_speed_kmh="108" />
+    </RoadTypeSpeedMappings>
+    
+    <PlatoonManager>
+		<PlatoonConfiguration max_size="5" max_distance="500" max_speed_difference="4" >
+		   <PlatoonVehicle label="Equipped" />
+		</PlatoonConfiguration>
+    </PlatoonManager>
+    
+    <Scenario network_filename="platoons.xodr">
+        <Simulation timestep="0.2" duration="8000" seed="42" crash_exit="true">
+            <TrafficComposition>
+                <VehicleType label="Equipped" fraction="0.5" relative_v0_randomization="0.0" />
+                <VehicleType label="NonEquipped" fraction="0.5" relative_v0_randomization="0.0" />
+            </TrafficComposition>
+            <Road id="1">
+                <TrafficSource logging="false">
+                    <Inflow t="0" q_per_hour="1800" v="20" />
+                    <Inflow t="5400" q_per_hour="1800" v="20" />
+                    <Inflow t="5400" q_per_hour="0" v="20" />
+                </TrafficSource>
+                <!-- increase inflow performance at source -->
+                <FlowConservingInhomogeneities>
+                    <Inhomogeneity position="0" valid_length="200" adaptation_length="200" start_alpha_T="0.8" target_alpha_T="1.0" />
+                </FlowConservingInhomogeneities>
+            </Road>
+        </Simulation>
+        <OutputConfiguration>
+        </OutputConfiguration>
+    </Scenario>
+</Movsim>
+
+
