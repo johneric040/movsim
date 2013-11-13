@@ -1,6 +1,5 @@
 package org.movsim.simulator.platoons;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.annotation.Nullable;
@@ -10,6 +9,7 @@ import org.movsim.autogen.PlatoonManagerType;
 import org.movsim.simulator.SimulationTimeStep;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.movsim.simulator.roadnetwork.RoadSegmentUtils;
 import org.movsim.simulator.vehicles.Vehicle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 
 public class PlatoonManager implements SimulationTimeStep {
 
@@ -44,10 +43,15 @@ public class PlatoonManager implements SimulationTimeStep {
             for (RoadSegment roadSegment : roadNetwork) {
                 LOG.info("roadSegment={}", roadSegment);
                 // TODO get sorted positions over lanes from RoadSegmentUtils
-                ArrayList<Vehicle> equippedVehicles = Lists.newArrayList(Iterators.filter(roadSegment.iterator(),
-                        isEquippedVehicle));
+                Collection<Vehicle> equippedVehicles = RoadSegmentUtils.sortVehiclesIncreasingPosition(Iterators
+                        .filter(roadSegment.iterator(), isEquippedVehicle));
+                // Collection<Vehicle> equippedVehicles = RoadSegmentUtils.sortVehiclesDecreasingPosition(Iterators
+                // .filter(roadSegment.iterator(), isEquippedVehicle));
                 showVehicles(label, equippedVehicles);
 
+                if (iterationCount == 100) {
+                    System.out.println(100);
+                }
                 Vehicle veh;
                 // veh.getPlatoonSettings().setAlphaT(0.2); // TODO enable in vehicle acc calc
             }
