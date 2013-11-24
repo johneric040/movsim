@@ -20,7 +20,12 @@ public class ServiceProvider implements SimulationTimeStep {
 
     private final String label;
 
+    private final double updateTime;
+    boolean update = true; 
+
     private final DecisionPoints decisionPoints;
+
+    private final Noise noise;
 
     private final RoadNetwork roadNetwork;
 
@@ -32,8 +37,10 @@ public class ServiceProvider implements SimulationTimeStep {
         Preconditions.checkNotNull(configuration);
         this.routing = Preconditions.checkNotNull(routing);
         this.label = configuration.getLabel();
+        this.updateTime = configuration.getUpdateTime();
         this.roadNetwork = Preconditions.checkNotNull(roadNetwork);
         this.decisionPoints = new DecisionPoints(configuration.getDecisionPoints(), routing);
+        this.noise = new Noise(configuration.getTau(), configuration.getFluctStrength());
         this.fileOutput = configuration.isLogging() ? new ServiceProviderLogging(this) : null;
     }
 
@@ -46,8 +53,11 @@ public class ServiceProvider implements SimulationTimeStep {
     }
 
     @Override
-    public void timeStep(double dt, double simulationTime, long iterationCount) {
-        evaluateDecisionPoints();
+    public void timeStep(double dt, double simulationTime, long iterationCount) {      
+        if(updateTime!=0){
+            update = (iterationCount%(updateTime / dt)==0) ? true: false;
+        }        
+        evaluateDecisionPoints(dt);
         if (fileOutput != null) {
             fileOutput.timeStep(dt, simulationTime, iterationCount);
         }
@@ -67,19 +77,28 @@ public class ServiceProvider implements SimulationTimeStep {
         return ""; // TODO
     }
 
-    private void evaluateDecisionPoints() {
+    private void evaluateDecisionPoints(double dt) {
         double uncertainty = decisionPoints.getUncertainty();
         // uncertainty as standard deviation must be >=0, already required by xsd
         for (DecisionPoint decisionPoint : decisionPoints) {
-            evaluateDecisionPoint(uncertainty, decisionPoint);
+            evaluateDecisionPoint(dt, uncertainty, decisionPoint);
         }
     }
 
-    private void evaluateDecisionPoint(double uncertainty, DecisionPoint decisionPoint) {
+    private void evaluateDecisionPoint(double dt, double uncertainty, DecisionPoint decisionPoint) {        
         for (RouteAlternative alternative : decisionPoint) {
+            double traveltimeError = 0;
+            if (noise != null) {
+                noise.update(dt, alternative.getTravelTimeError());
+                traveltimeError = noise.getTimeError();
+            }
             // usage of metric for disutility
-            double traveltime = RoadNetworkUtils.instantaneousTravelTime(routing.get(alternative.getRouteLabel()));
-            alternative.setDisutility(traveltime);
+            double traveltime = traveltimeError
+                    + RoadNetworkUtils.instantaneousTravelTime(routing.get(alternative.getRouteLabel()));
+            alternative.setTravelTimeError(traveltimeError);
+            if (update) {
+                alternative.setDisutility(traveltime);
+            }
         }
         calcProbabilities(decisionPoint, uncertainty);
     }
